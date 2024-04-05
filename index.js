@@ -29,8 +29,12 @@ class Connection {
 
     joinGroup(group) {
         this.socket.join(group);
-        this.sendGroupMessage('joining', group)
-        console.log(group)
+        this.sendGroupMessage('joining', group);
+
+        if (!groups.has(group)) {
+            groups.add(group);
+            this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
+        }
     }
 
     joinPrivate(username) {
