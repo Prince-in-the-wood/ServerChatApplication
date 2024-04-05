@@ -25,7 +25,11 @@ class Connection {
     }
 
     joinChat(username) {
-        if (Array.from(users.values()).includes(username)) return;
+        if (Array.from(users.values()).includes(username)) {
+            this.io.sockets.to(this.socket.id).emit('error', 'Username cannot be duplicated');
+            return;
+        }
+
         users.set(this.socket, username);
         this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
     }
@@ -52,11 +56,12 @@ class Connection {
             message: message || "",
             time: (new Date()).toISOString()
         }
-        this.io.sockets.to(groups).emit(groups, msg);
+        this.io.sockets.to(groups).emit("group-" + groups, msg);
     }
 
     disconnect() {
         users.delete(this.socket);
+        this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
     }
 }
 
