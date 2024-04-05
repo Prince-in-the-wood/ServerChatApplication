@@ -10,7 +10,7 @@ class Connection {
 
         socket.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
 
-        socket.on('change-username', (username) => this.changeUsername(username));
+        socket.on('change-username', (username) => this.joinChat(username));
 
         socket.on('join', (username) => this.joinChat(username));
         socket.on('join-group', (group) => this.joinGroup(group));
@@ -22,11 +22,6 @@ class Connection {
         socket.on('connect_error', (err) => {
             console.log(`connect_error due to ${err.message}`);
         });
-    }
-
-    changeUsername(username) {
-        if (Array.from(users.values()).includes(username)) return;
-        username.set(this.socket, username);
     }
 
     joinChat(username) {
