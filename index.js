@@ -61,7 +61,6 @@ class Connection {
             groups.add([false,privateChat]);
             this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
         }
-        console.log({ "users": Array.from(users.values()), "groups": Array.from(groups) })
     }
 
     sendGroupMessage(message, group) {
