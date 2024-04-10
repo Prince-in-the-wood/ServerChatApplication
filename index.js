@@ -38,8 +38,8 @@ class Connection {
     joinGroup(group) {
         this.socket.join(group);
         this.sendGroupMessage('joining', group);
-
-        if (!groups.has([true,group])) {
+        const groupNameArray = Array.from(groups).map(g => g[1]);
+        if (!groupNameArray.includes(group)) {
             groups.add([true,group]);
             this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
         }
@@ -56,8 +56,8 @@ class Connection {
         this.socket.join(privateChat);
         targetSocket.join(privateChat);
         this.sendPrivateMessage('joining',targetUsername)
-       
-        if(!groups.has([false,privateChat])){
+        const groupNameArray = Array.from(groups).map(g => g[1]);
+        if(!groupNameArray.includes(privateChat)){
             groups.add([false,privateChat]);
             this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
         }
