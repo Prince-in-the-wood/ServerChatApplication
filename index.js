@@ -17,7 +17,8 @@ class Connection {
         socket.on('join-private', (username) => this.joinPrivate(username));
 
         socket.on('send-group-message', (message, group) => this.sendGroupMessage(message, group));
-
+        socket.on('send-private-message',(message, username) => this.sendPrivateMessage(message,username));
+        
         socket.on('disconnect', () => this.disconnect());
         socket.on('connect_error', (err) => {
             console.log(`connect_error due to ${err.message}`);
