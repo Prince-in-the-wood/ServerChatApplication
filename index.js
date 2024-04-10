@@ -53,11 +53,15 @@ class Connection {
         }
         const myUsername = users.get(this.socket)
         const privateChat = this.hashPrivateChatName(myUsername,targetUsername);
+        this.socket.join(privateChat);
+        targetSocket.join(privateChat);
+        this.sendPrivateMessage('joining',targetUsername)
+       
         if(!groups.has([false,privateChat])){
             groups.add([false,privateChat]);
             this.io.sockets.emit('available', { "users": Array.from(users.values()), "groups": Array.from(groups) });
         }
-
+        console.log({ "users": Array.from(users.values()), "groups": Array.from(groups) })
     }
 
     sendGroupMessage(message, group) {
@@ -70,7 +74,7 @@ class Connection {
         }
         this.io.sockets.to(group).emit("group-" + group, msg);
     }
-
+    
     sendPrivateMessage(message,targetUsername){
         const targetSocket = [...users.entries()].find(([socket, username]) => username === targetUsername)?.[0];
         if(!targetSocket){
