@@ -16,8 +16,8 @@ class Connection {
         socket.on('join-group', (group) => this.joinGroup(group));
         socket.on('join-private', (username) => this.joinPrivate(username));
 
-        socket.on('send-group-message', (message, group) => this.sendGroupMessage(message, group));
-        socket.on('send-private-message',(message, username) => this.sendPrivateMessage(message,username));
+        socket.on('send-group-message', (message, group,isText) => this.sendGroupMessage(message, group,isText));
+        socket.on('send-private-message',(message, username,isText) => this.sendPrivateMessage(message,username,isText));
         
         socket.on('disconnect', () => this.disconnect());
         socket.on('connect_error', (err) => {
@@ -37,7 +37,7 @@ class Connection {
 
     joinGroup(group) {
         this.socket.join(group);
-        this.sendGroupMessage('joining', group);
+        this.sendGroupMessage('joining', group,true);
         const groupNameArray = Array.from(groups).map(g => g[1]);
         if (!groupNameArray.includes(group)) {
             groups.add([true,group]);
@@ -55,7 +55,7 @@ class Connection {
         const privateChat = this.hashPrivateChatName(myUsername,targetUsername);
         this.socket.join(privateChat);
         targetSocket.join(privateChat);
-        this.sendPrivateMessage('joining',targetUsername)
+        this.sendPrivateMessage('joining',targetUsername,true)
         const groupNameArray = Array.from(groups).map(g => g[1]);
         if(!groupNameArray.includes(privateChat)){
             groups.add([false,privateChat]);
@@ -63,18 +63,19 @@ class Connection {
         }
     }
 
-    sendGroupMessage(message, group) {
+    sendGroupMessage(message, group , isText) {
         const myUsername = users.get(this.socket)
         const msg = {
             chatName: group,
             from: myUsername,
             message: message || "",
+            isText : isText,
             time: (new Date()).toISOString()
         }
         this.io.sockets.to(group).emit("group-" + group, msg);
     }
     
-    sendPrivateMessage(message,targetUsername){
+    sendPrivateMessage(message,targetUsername,isText){
         const targetSocket = [...users.entries()].find(([socket, username]) => username === targetUsername)?.[0];
         if(!targetSocket){
             console.log(`Username ${targetUsername} not found`);
@@ -86,6 +87,7 @@ class Connection {
             chatName: privateChat,
             from: myUsername,
             message: message || "",
+            isText : isText,
             time: (new Date()).toISOString()
         }
         this.io.sockets.to(privateChat).emit("private-"+ privateChat,msg);
